@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Garments Costing Studio | Buying House</title>
+<style>
+:root{--navy:#132238;--blue:#2563eb;--teal:#0f766e;--bg:#f3f6fb;--line:#dbe3ef;--muted:#64748b;--white:#fff;--red:#b91c1c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,"Noto Sans Bengali",sans-serif;color:#172033}
+header{background:linear-gradient(120deg,#132238,#1d4f72);color:#fff;padding:18px 28px;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
+header h1{font-size:23px;margin:0 0 4px}header p{margin:0;color:#cbd5e1;font-size:13px}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,.btn{border:0;border-radius:8px;padding:10px 13px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;font-size:13px}
+button.secondary{background:#e2e8f0;color:#172033}button.dark{background:#0f766e}button.danger{background:#b91c1c}
+.logo-upload{background:#e2e8f0;color:#172033;padding:10px 13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:inline-block}
+.garment-upload{background:#fbbf24;color:#172033;padding:10px 13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:inline-block}
+.container{max-width:1440px;margin:auto;padding:20px}
+.notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.5;margin-bottom:16px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab{background:#e2e8f0;color:#334155}.tab.active{background:var(--navy);color:#fff}
+.panel{background:#fff;border:1px solid var(--line);border-radius:13px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px #0f172a08}
+.panel h2{font-size:17px;margin:0 0 15px;color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font-size:12px;color:#475569;font-weight:700}
+.field input,.field select,.field textarea{width:100%;border:1px solid #cbd5e1;border-radius:7px;padding:10px;font-size:13px;background:#fff;color:#172033;min-width:0}
+.field input:focus,.field select:focus{outline:2px solid #bfdbfe;border-color:#60a5fa}
+.span2{grid-column:span 2}
+.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:700px;font-size:12px}
+th,td{border:1px solid var(--line);padding:8px;text-align:left;vertical-align:middle}
+th{background:#eef3f9;color:#334155}
+td input,td select{width:100%;min-width:75px;border:1px solid #cbd5e1;border-radius:5px;padding:7px;font-size:12px}
+td.num,th.num{text-align:right}
+.table-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{padding:15px;border-radius:11px;background:#f8fafc;border:1px solid var(--line)}
+.kpi span{font-size:12px;color:var(--muted);display:block;margin-bottom:7px}
+.kpi strong{font-size:21px;color:var(--navy);overflow-wrap:anywhere}
+.summary-table{max-width:850px}
+.summary-table td:last-child,.summary-table th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.final-price{background:#ecfdf5;font-weight:800;color:#065f46}
+.small{font-size:11px;color:var(--muted);line-height:1.5}
+.hidden{display:none!important}
+.saved-list{display:flex;gap:8px;flex-wrap:wrap}
+.saved-item{border:1px solid var(--line);border-radius:8px;padding:8px;background:#f8fafc;display:flex;gap:8px;align-items:center;font-size:12px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:18px}
+.brand{display:flex;align-items:center;gap:14px}
+#companyLogo{height:55px;width:auto;border-radius:6px;background:#fff;padding:3px;display:none;object-fit:contain}
+
+/* Garment Image Section */
+.garment-image-section{
+  display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;
+}
+.garment-preview-box{
+  border:2px dashed #cbd5e1; border-radius:12px; padding:16px;
+  min-height:180px; display:flex; align-items:center; justify-content:center;
+  background:#f8fafc; position:relative; overflow:hidden;
+}
+.garment-preview-box img{
+  max-width:100%; max-height:260px; border-radius:8px; object-fit:contain;
+}
+.garment-preview-box .placeholder{
+  text-align:center; color:#94a3b8; font-size:13px;
+}
+.garment-preview-box .placeholder i{font-size:32px; margin-bottom:8px; display:block; color:#cbd5e1;}
+.btn-remove-img{
+  position:absolute; top:8px; right:8px; background:#dc2626; color:white;
+  border:none; width:28px; height:28px; border-radius:50%;
+  cursor:pointer; font-size:14px; display:none; z-index:5;
+}
+
+@media(max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.garment-image-section{grid-template-columns:1fr}}
+@media(max-width:600px){header{padding:18px}.container{padding:12px}.grid,.kpis{grid-template-columns:1fr}.span2{grid-column:span 1}.panel{padding:13px}header h1{font-size:19px}}
+
+/* ===== PRINT — A4 ONE PAGE ===== */
+@media print {
+  @page { size: A4; margin: 6mm; }
+  body { background:#fff; zoom: 0.60; }
+  header { background:#fff !important; color:#111 !important; padding:0 0 8px !important; border-bottom:2px solid #132238; margin-bottom:8px; }
+  header h1 { color:#132238 !important; font-size:18px !important; }
+  header p { color:#444 !important; font-size:10px !important; }
+  .header-actions, .tabs, .notice, .table-actions, .no-print, footer, label.logo-upload, label.garment-upload, .logo-upload, .garment-upload { display:none !important; }
+  .container { padding:0; max-width:none; }
+  .panel { box-shadow:none; break-inside:avoid; padding:6px 8px; margin-bottom:5px; border:1px solid #ccc; }
+  .panel h2 { font-size:12px !important; margin:0 0 5px !important; }
+  .grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; }
+  .field label { font-size:8px; }
+  .field input, .field select, .field textarea { border:0; padding:1px; font-size:9px; background:#fff; }
+  .table-wrap { overflow:visible; }
+  table { min-width:0 !important; font-size:8.5px !important; }
+  th, td { padding:2px 3px !important; }
+  td input, td select { border:0; padding:1px; font-size:8.5px; background:#fff; }
+  .kpi { padding:5px; }
+  .kpi span { font-size:8px; margin-bottom:2px; }
+  .kpi strong { font-size:12px; }
+  .summary-table { max-width:100% !important; }
+  .summary-table td { font-size:8.5px; }
+  #companyLogo { display:block !important; height:38px !important; }
+
+  /* Garment image print */
+  .garment-image-section { grid-template-columns:1fr 1fr !important; gap:6px !important; }
+  .garment-preview-box { min-height:auto; padding:4px; border:1px solid #ccc; }
+  .garment-preview-box img { max-height:120px !important; }
+  .garment-preview-box .placeholder { display:none !important; }
+  .btn-remove-img { display:none !important; }
+
+  .panel h2::before { content:""; }
+  .small { display:none; }
+  section#saved, section#guide { display:none !important; }
+}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand">
+  <img id="companyLogo" alt="Company Logo">
+  <div>
+   <h1>Garments Costing Studio</h1>
+   <p>Buying House Costing • Knit / Woven / Sweater • USD & BDT</p>
+  </div>
+ </div>
+ <div class="header-actions">
+  <label class="logo-upload">Upload Logo
+   <input type="file" id="logoUpload" accept="image/*" style="display:none;">
+  </label>
+  <label class="garment-upload">Upload Garment Image
+   <input type="file" id="garmentUpload" accept="image/*" style="display:none;">
+  </label>
+  <button class="secondary" onclick="newCosting()">New Costing</button>
+  <button class="dark" onclick="saveCosting()">Save Costing</button>
+  <button onclick="exportCSV()">Export CSV</button>
+  <button onclick="window.print()">Print / Save PDF</button>
+ </div>
+</header>
+<main class="container">
+ <div class="notice"><b>গুরুত্বপূর্ণ:</b> এটি একটি ব্যবহারযোগ্য browser-based costing prototype। আপনার দেওয়া consumption, supplier price, CM, wastage ও pricing assumption অনুযায়ী হিসাব করবে। বাস্তব quotation পাঠানোর আগে factory/buyer-এর costing policy অনুযায়ী সব input যাচাই করুন। Save Costing এই browser-এর local storage-এ সংরক্ষণ করে; এটি server database নয়।</div>
+ <div class="tabs no-print">
+  <button class="tab active" data-tab="costing">Costing Sheet</button>
+  <button class="tab" data-tab="saved">Saved Costings</button>
+  <button class="tab" data-tab="guide">Formula Guide</button>
+ </div>
+ <section id="costing">
+
+  <!-- Garment Image Section (NEW) -->
+  <div class="panel">
+   <h2>Garment Image / Product Preview</h2>
+   <p class="small">Garments এর ছবি আপলোড করুন — এটি print/PDF quotation-এও আসবে।</p>
+   <div class="garment-image-section">
+    <div class="garment-preview-box">
+     <button class="btn-remove-img" id="removeGarmentBtn" title="Remove image">×</button>
+     <img id="garmentImage" alt="Garment Image" style="display:none;">
+     <div class="placeholder" id="garmentPlaceholder">
+      <i class="fas fa-tshirt" style="font-family:Arial;">👕</i>
+      <div>No garment image uploaded</div>
+      <div style="font-size:11px; margin-top:4px;">Click "Upload Garment Image" above</div>
+     </div>
+    </div>
+    <div>
+     <div class="field">
+      <label>Garment Image Caption (optional)</label>
+      <input type="text" id="garmentCaption" placeholder="e.g. Front view / Style sketch / Sample photo">
+     </div>
+     <div class="field" style="margin-top:12px;">
+      <label>Image Notes</label>
+      <textarea id="garmentNotes" rows="4" placeholder="Any notes about the garment image, color, fit, etc."></textarea>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <div class="panel">
+   <h2>01. Buyer & Style Information</h2>
+   <div class="grid">
+    <div class="field"><label>Buyer Name</label><input id="buyer" placeholder="Buyer / Brand"></div>
+    <div class="field"><label>Style Number *</label><input id="style" placeholder="e.g. ST-26001"></div>
+    <div class="field"><label>Style Description</label><input id="description" placeholder="e.g. Men's Crew Neck Sweater"></div>
+    <div class="field"><label>Product Category</label><select id="category"><option>Knit</option><option>Woven</option><option>Sweater</option></select></div>
+    <div class="field"><label>Season</label><input id="season" placeholder="e.g. AW27"></div>
+    <div class="field"><label>Factory Name</label><input id="factory" placeholder="Factory / Vendor"></div>
+    <div class="field"><label>Merchandiser</label><input id="merchandiser" placeholder="Name"></div>
+    <div class="field"><label>Costing Date</label><input id="costDate" type="date"></div>
+    <div class="field"><label>Order Quantity (pcs) *</label><input id="qty" type="number" min="1" value="10000"></div>
+    <div class="field"><label>Target FOB / pc (USD)</label><input id="target" type="number" min="0" step="0.01" value="0"></div>
+    <div class="field"><label>Exchange Rate (BDT per USD)</label><input id="fx" type="number" min="0.01" step="0.01" value="122"></div>
+    <div class="field"><label>Costing Revision</label><input id="revision" value="R0"></div>
+   </div>
+  </div>
+  <div class="panel">
+   <h2>02. Fabric / Yarn Costing</h2>
+   <p class="small" id="materialHelp">Knit/Woven: consumption in kg, meter, yard or pcs as appropriate. Sweater: yarn consumption in grams per garment; unit price per kg.</p>
+   <div class="table-wrap"><table id="materialTable"><thead><tr><th>Material / Yarn</th><th>Specification / Composition</th><th>Unit</th><th class="num">Base Consumption / pc</th><th class="num">Wastage %</th><th class="num">Unit Price (USD)</th><th>Price Unit</th><th class="num">Cost / pc (USD)</th><th></th></tr></thead><tbody id="materialRows"></tbody></table></div>
+   <div class="table-actions no-print"><button onclick="addMaterial()">+ Add Fabric / Yarn</button><button class="secondary" onclick="addPresetMaterial()">Add category example</button></div>
+  </div>
+  <div class="panel">
+   <h2>03. Trims & Accessories</h2>
+   <div class="table-wrap"><table><thead><tr><th>Item</th><th>Unit</th><th class="num">Qty / pc</th><th class="num">Wastage %</th><th class="num">Unit Price (USD)</th><th class="num">Cost / pc (USD)</th><th></th></tr></thead><tbody id="trimRows"></tbody></table></div>
+   <div class="table-actions no-print"><button onclick="addTrim()">+ Add Trim</button><button class="secondary" onclick="addCommonTrims()">Add common trims</button></div>
+  </div>
+  <div class="panel">
+   <h2>04. Manufacturing & Other Process Cost (USD / garment)</h2>
+   <p class="small">CM-এ যে process অন্তর্ভুক্ত আছে, সেটি আবার আলাদা process হিসেবে যোগ করবেন না—নইলে double counting হবে।</p>
+   <div class="table-wrap"><table><thead><tr><th>Cost Head</th><th class="num">Cost / pc (USD)</th><th>Notes</th><th></th></tr></thead><tbody id="processRows"></tbody></table></div>
+   <div class="table-actions no-print"><button onclick="addProcess()">+ Add Cost Head</button><button class="secondary" onclick="addProcessPresets()">Add common cost heads</button></div>
+  </div>
+  <div class="panel">
+   <h2>05. Pricing & FOB Calculation</h2>
+   <div class="grid">
+    <div class="field"><label>Overhead (%) on production cost</label><input id="overheadPct" type="number" min="0" step="0.01" value="3"></div>
+    <div class="field"><label>Commission (%) of FOB</label><input id="commissionPct" type="number" min="0" max="99.99" step="0.01" value="5"></div>
+    <div class="field"><label>Profit pricing method</label><select id="profitMethod"><option value="margin">Profit margin on selling price</option><option value="markup">Markup on cost</option></select></div>
+    <div class="field"><label>Profit (%)</label><input id="profitPct" type="number" min="0" max="99.99" step="0.01" value="8"></div>
+    <div class="field"><label>Other FOB / logistics cost per pc (USD)</label><input id="logistics" type="number" min="0" step="0.0001" value="0"></div>
+    <div class="field"><label>Extra fixed order cost (USD)</label><input id="fixedCost" type="number" min="0" step="0.01" value="0"></div>
+   </div>
+   <p class="small">Pricing model used: production cost + overhead + logistics + allocated fixed cost, then profit/markup and commission-on-FOB gross-up. Commission is calculated as a percentage of final FOB. This is one configurable model; confirm the exact commercial convention used by your buying house.</p>
+  </div>
+  <div class="panel">
+   <h2>06. Costing Summary</h2>
+   <div class="kpis">
+    <div class="kpi"><span>Production Cost / pc</span><strong id="kpiProduction">$0.0000</strong></div>
+    <div class="kpi"><span>Estimated FOB / pc</span><strong id="kpiFOB">$0.0000</strong></div>
+    <div class="kpi"><span>Total FOB Order Value</span><strong id="kpiOrder">$0.00</strong></div>
+    <div class="kpi"><span>Target Price Difference / pc</span><strong id="kpiVariance">$0.0000</strong></div>
+   </div>
+   <div class="table-wrap" style="margin-top:16px"><table class="summary-table"><thead><tr><th>Cost Summary</th><th>USD / pc</th><th>BDT / pc</th><th>Total USD (Order)</th></tr></thead><tbody id="summaryRows"></tbody></table></div>
+   <p class="small" id="summaryNote"></p>
+  </div>
+  <div class="panel">
+   <h2>07. Notes & Approval</h2>
+   <div class="grid">
+    <div class="field span2"><label>Costing Remarks</label><textarea id="remarks" rows="3" placeholder="Assumptions, supplier quote reference, exclusions..."></textarea></div>
+    <div class="field"><label>Prepared By</label><input id="prepared" placeholder="Prepared by"></div>
+    <div class="field"><label>Approval Status</label><select id="approval"><option>Draft</option><option>Pending Approval</option><option>Approved</option><option>Rejected</option></select></div>
+   </div>
+   <div style="margin-top:14px; display:flex; gap:40px; flex-wrap:wrap;">
+     <div style="flex:1; min-width:200px; border-top:1px solid #94a3b8; padding-top:6px; font-size:11px; color:#64748b;">Prepared By Signature</div>
+     <div style="flex:1; min-width:200px; border-top:1px solid #94a3b8; padding-top:6px; font-size:11px; color:#64748b;">Approved By Signature</div>
+   </div>
+  </div>
+ </section>
+ <section id="saved" class="hidden">
+  <div class="panel"><h2>Saved Costings (এই browser-এ)</h2><p class="small">একই browser ও device-এ local storage-এ রাখা costings এখানে পাবেন। Browser data clear করলে এই saved data মুছে যেতে পারে।</p><div id="savedList" class="saved-list"></div></div>
+ </section>
+ <section id="guide" class="hidden">
+  <div class="panel"><h2>Formula Guide</h2>
+   <p><b>Material cost / pc:</b> Base consumption × (1 + wastage% / 100) × unit price, unit conversion অনুযায়ী।</p>
+   <p><b>Sweater yarn:</b> Yarn grams per garment × (1 + wastage% / 100) ÷ 1000 × price per kg।</p>
+   <p><b>Trim cost / pc:</b> Qty per garment × (1 + wastage% / 100) × unit price।</p>
+   <p><b>Production cost:</b> Material/yarn + trims + all manufacturing/process costs।</p>
+   <p><b>Overhead:</b> Production cost × overhead %।</p>
+   <p><b>Profit margin method:</b> Base cost ÷ (1 − margin %)।</p>
+   <p><b>Markup method:</b> Base cost × (1 + markup %)।</p>
+   <p><b>Commission gross-up:</b> (base selling price) ÷ (1 − commission %)।</p>
+   <p class="small">এই prototype-এ fabric/yarn unit price conversion: gram→kg, meter→meter, yard→yard, pcs→pcs, kg→kg। Price Unit-এর সঙ্গে consumption unit মিলিয়ে input দিন। For example, consumption in kg with price per kg, consumption in meter with price per meter. Sweater yarn-এর জন্য consumption unit g এবং price unit kg বেছে নিন।</p>
+  </div>
+ </section>
+</main>
+<footer>Garments Costing Studio • Browser-based prototype • Verify all commercial assumptions before issuing a quotation.</footer>
+<script>
+const $ = id => document.getElementById(id);
+const currency = n => '$' + (Number.isFinite(n)?n:0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:4});
+const money2 = n => (Number.isFinite(n)?n:0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const val = id => { const n = parseFloat($(id).value); return Number.isFinite(n)?n:0; };
+const safe = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let rowId=0;
+function unitOptions(selected){return ['kg','g','meter','yard','pcs','dozen'].map(u=>`<option ${u===selected?'selected':''}>${u}</option>`).join('')}
+function addMaterial(data={}){
+ const id=++rowId, tr=document.createElement('tr');tr.dataset.id=id;tr.className='material-row';
+ tr.innerHTML=`<td><input data-k="name" value="${safe(data.name||'')}" placeholder="Fabric / yarn"></td>
+ <td><input data-k="spec" value="${safe(data.spec||'')}" placeholder="Composition / GSM / count"></td>
+ <td><select data-k="unit">${unitOptions(data.unit||($('category').value==='Sweater'?'g':'kg'))}</select></td>
+ <td><input data-k="cons" type="number" min="0" step="0.0001" value="${data.cons??0}"></td>
+ <td><input data-k="waste" type="number" min="0" step="0.01" value="${data.waste??5}"></td>
+ <td><input data-k="price" type="number" min="0" step="0.0001" value="${data.price??0}"></td>
+ <td><select data-k="priceUnit">${unitOptions(data.priceUnit||($('category').value==='Sweater'?'kg':($('category').value==='Woven'?'meter':'kg')))}</select></td>
+ <td class="num row-cost">$0.0000</td><td><button class="danger" onclick="this.closest('tr').remove();calculate()">×</button></td>`;
+ $('materialRows').appendChild(tr);tr.querySelectorAll('input,select').forEach(e=>e.addEventListener('input',calculate));calculate();
+}
+function addTrim(data={}){
+ const tr=document.createElement('tr');tr.className='trim-row';
+ tr.innerHTML=`<td><input data-k="name" value="${safe(data.name||'')}" placeholder="e.g. Main label"></td>
+ <td><select data-k="unit">${unitOptions(data.unit||'pcs')}</select></td>
+ <td><input data-k="qty" type="number" min="0" step="0.0001" value="${data.qty??1}"></td>
+ <td><input data-k="waste" type="number" min="0" step="0.01" value="${data.waste??2}"></td>
+ <td><input data-k="price" type="number" min="0" step="0.0001" value="${data.price??0}"></td>
+ <td class="num row-cost">$0.0000</td><td><button class="danger" onclick="this.closest('tr').remove();calculate()">×</button></td>`;
+ $('trimRows').appendChild(tr);tr.querySelectorAll('input,select').forEach(e=>e.addEventListener('input',calculate));calculate();
+}
+function addProcess(data={}){
+ const tr=document.createElement('tr');tr.className='process-row';
+ tr.innerHTML=`<td><input data-k="name" value="${safe(data.name||'')}" placeholder="Cost head"></td>
+ <td><input data-k="cost" type="number" min="0" step="0.0001" value="${data.cost??0}"></td>
+ <td><input data-k="note" value="${safe(data.note||'')}" placeholder="Optional note"></td>
+ <td><button class="danger" onclick="this.closest('tr').remove();calculate()">×</button></td>`;
+ $('processRows').appendChild(tr);tr.querySelectorAll('input').forEach(e=>e.addEventListener('input',calculate));calculate();
+}
+function addPresetMaterial(){
+ const c=$('category').value;
+ if(c==='Sweater') addMaterial({name:'Main Yarn',spec:'e.g. 100% cotton / acrylic',unit:'g',cons:350,waste:5,price:8,priceUnit:'kg'});
+ else if(c==='Woven') addMaterial({name:'Main Fabric',spec:'e.g. 100% cotton, 120 GSM',unit:'meter',cons:1.6,waste:5,price:2.2,priceUnit:'meter'});
+ else addMaterial({name:'Main Fabric',spec:'e.g. Single Jersey, 180 GSM',unit:'kg',cons:0.22,waste:5,price:5,priceUnit:'kg'});
+}
+function addCommonTrims(){['Main label','Care label','Size label','Hangtag','Polybag','Carton allocation','Sewing thread'].forEach(name=>addTrim({name,unit:'pcs',qty:name==='Carton allocation'?0.05:1,waste:2,price:0}))}
+function addProcessPresets(){['CM / Making','Knitting / Linking','Dyeing / Washing','Printing','Embroidery','Finishing / Ironing','Packing','Testing / Inspection'].forEach(name=>addProcess({name,cost:0,note:''}))}
+function convertConsumption(cons, unit, priceUnit){
+ if(unit===priceUnit)return cons;
+ if(unit==='g'&&priceUnit==='kg')return cons/1000;
+ if(unit==='kg'&&priceUnit==='g')return cons*1000;
+ if(unit==='dozen'&&priceUnit==='pcs')return cons*12;
+ if(unit==='pcs'&&priceUnit==='dozen')return cons/12;
+ return null;
+}
+function calculate(){
+ let mat=0,trim=0,proc=0,unknown=[];
+ document.querySelectorAll('.material-row').forEach(tr=>{
+  const get=k=>tr.querySelector(`[data-k="${k}"]`).value;
+  const unit=get('unit'), pu=get('priceUnit'), cons=+get('cons')||0, waste=+get('waste')||0, price=+get('price')||0;
+  const converted=convertConsumption(cons,unit,pu);
+  let cost=0;
+  if(converted===null){unknown.push(get('name')||'Unnamed material');tr.querySelector('.row-cost').textContent='Unit mismatch';}
+  else{cost=converted*(1+waste/100)*price;tr.querySelector('.row-cost').textContent=currency(cost);mat+=cost;}
+ });
+ document.querySelectorAll('.trim-row').forEach(tr=>{
+  const get=k=>tr.querySelector(`[data-k="${k}"]`).value;
+  const qty=+get('qty')||0,waste=+get('waste')||0,price=+get('price')||0,cost=qty*(1+waste/100)*price;
+  tr.querySelector('.row-cost').textContent=currency(cost);trim+=cost;
+ });
+ document.querySelectorAll('.process-row').forEach(tr=>{proc+=+tr.querySelector('[data-k="cost"]').value||0});
+ const production=mat+trim+proc;
+ const qty=Math.max(0,val('qty'));
+ const overhead=production*val('overheadPct')/100;
+ const fixed=qty>0?val('fixedCost')/qty:0;
+ const base=production+overhead+Math.max(0,val('logistics'))+fixed;
+ const p=Math.max(0,Math.min(99.99,val('profitPct')))/100;
+ const sellingBase=$('profitMethod').value==='markup'?base*(1+p):base/(1-p);
+ const commission=Math.max(0,Math.min(99.99,val('commissionPct')))/100;
+ const fob=commission<1?sellingBase/(1-commission):0;
+ const commissionCost=fob*commission;
+ const profit=sellingBase-base;
+ const totalOrder=fob*qty, fx=Math.max(0,val('fx')), target=val('target'), variance=fob-target;
+ $('kpiProduction').textContent=currency(production);
+ $('kpiFOB').textContent=currency(fob);
+ $('kpiOrder').textContent='$'+money2(totalOrder);
+ $('kpiVariance').textContent=(variance>0?'+':'')+currency(variance);
+ $('kpiVariance').style.color=target>0?(variance>0?'#b91c1c':'#047857'):'#132238';
+ const rows=[
+  ['Fabric / Yarn',mat],['Trims & Accessories',trim],['Manufacturing / Process',proc],['Production Cost',production,'bold'],
+  ['Overhead',overhead],['Logistics / FOB costs',Math.max(0,val('logistics'))],['Allocated Fixed Cost',fixed],
+  ['Cost Before Profit & Commission',base],['Profit / Markup allowance',profit],['Commission (on final FOB)',commissionCost],['Final Estimated FOB',fob,'final'],
+  ['Target FOB',target],['Difference vs Target',variance],['Total FOB Order Value',totalOrder,'final']
+ ];
+ $('summaryRows').innerHTML=rows.map(([name,n,style])=>`<tr class="${style==='final'?'final-price':''}"><td>${name}</td><td>${currency(n)}</td><td>${currency(n*fx).replace('$','৳')}</td><td>${currency(n*qty)}</td></tr>`).join('');
+ $('summaryNote').textContent=unknown.length?'Unit mismatch: '+unknown.join(', ')+'. Material cost for these rows was excluded; make the consumption unit match the price unit (or use g with kg price for sweater yarn).':`Exchange rate: 1 USD = ৳${fx.toFixed(2)}. Estimated cost only; validate process inclusion and buying-house pricing policy.`;
+}
+function getState(){
+ const fields=['buyer','style','description','category','season','factory','merchandiser','costDate','qty','target','fx','revision','overheadPct','commissionPct','profitMethod','profitPct','logistics','fixedCost','remarks','prepared','approval','garmentCaption','garmentNotes'];
+ const state={};fields.forEach(id=>state[id]=$(id).value);
+ state.materials=[...document.querySelectorAll('.material-row')].map(tr=>{const o={};tr.querySelectorAll('[data-k]').forEach(e=>o[e.dataset.k]=e.value);return o});
+ state.trims=[...document.querySelectorAll('.trim-row')].map(tr=>{const o={};tr.querySelectorAll('[data-k]').forEach(e=>o[e.dataset.k]=e.value);return o});
+ state.processes=[...document.querySelectorAll('.process-row')].map(tr=>{const o={};tr.querySelectorAll('[data-k]').forEach(e=>o[e.dataset.k]=e.value);return o});
+ state.updatedAt=new Date().toISOString();return state;
+}
+function loadState(s){
+ ['buyer','style','description','category','season','factory','merchandiser','costDate','qty','target','fx','revision','overheadPct','commissionPct','profitMethod','profitPct','logistics','fixedCost','remarks','prepared','approval','garmentCaption','garmentNotes'].forEach(id=>{if(s[id]!==undefined)$(id).value=s[id]});
+ $('materialRows').innerHTML='';$('trimRows').innerHTML='';$('processRows').innerHTML='';
+ (s.materials||[]).forEach(addMaterial);(s.trims||[]).forEach(addTrim);(s.processes||[]).forEach(addProcess);calculate();
+}
+function saveCosting(){
+ const s=getState();if(!s.style.trim()){alert('Please enter Style Number before saving.');$('style').focus();return}
+ let list=JSON.parse(localStorage.getItem('garmentsCostings')||'[]');const key=s.style+'|'+s.revision;
+ const idx=list.findIndex(x=>x.style+'|'+x.revision===key);if(idx>=0)list[idx]=s;else list.unshift(s);
+ localStorage.setItem('garmentsCostings',JSON.stringify(list));renderSaved();alert('Costing saved in this browser.');
+}
+function renderSaved(){
+ const list=JSON.parse(localStorage.getItem('garmentsCostings')||'[]');$('savedList').innerHTML='';
+ if(!list.length){$('savedList').textContent='No saved costing yet.';return}
+ list.forEach((s,i)=>{const div=document.createElement('div');div.className='saved-item';div.innerHTML=`<span><b>${safe(s.style)}</b> — ${safe(s.buyer||'No buyer')} (${safe(s.category)}) <span class="small">${safe(s.revision||'R0')}</span></span><button onclick="openSaved(${i})">Open</button><button class="danger" onclick="deleteSaved(${i})">Delete</button>`;$('savedList').appendChild(div)});
+}
+function openSaved(i){const list=JSON.parse(localStorage.getItem('garmentsCostings')||'[]');if(list[i]){loadState(list[i]);document.querySelector('[data-tab="costing"]').click()}}
+function deleteSaved(i){if(!confirm('Delete this saved costing?'))return;const list=JSON.parse(localStorage.getItem('garmentsCostings')||'[]');list.splice(i,1);localStorage.setItem('garmentsCostings',JSON.stringify(list));renderSaved()}
+function newCosting(){
+ if(!confirm('Start a new costing? Save the current one first if needed.'))return;
+ ['buyer','style','description','season','factory','merchandiser','target','remarks','prepared','garmentCaption','garmentNotes'].forEach(id=>$(id).value='');
+ $('qty').value=10000;$('revision').value='R0';$('overheadPct').value=3;$('commissionPct').value=5;$('profitPct').value=8;$('profitMethod').value='margin';$('logistics').value=0;$('fixedCost').value=0;$('approval').value='Draft';$('costDate').value=new Date().toISOString().slice(0,10);
+ $('materialRows').innerHTML='';$('trimRows').innerHTML='';$('processRows').innerHTML='';addPresetMaterial();addCommonTrims();addProcessPresets();calculate();
+}
+function exportCSV(){
+ const s=getState(), lines=[['Garments Costing Studio'],['Buyer',s.buyer],['Style',s.style],['Description',s.description],['Category',s.category],['Order Quantity',s.qty],['Exchange Rate',s.fx],[],['Fabric / Yarn','Specification','Unit','Consumption','Wastage %','Unit Price','Price Unit'],...s.materials.map(m=>[m.name,m.spec,m.unit,m.cons,m.waste,m.price,m.priceUnit]),[],['Trims','Unit','Qty / pc','Wastage %','Unit Price'],...s.trims.map(t=>[t.name,t.unit,t.qty,t.waste,t.price]),[],['Process','Cost / pc','Notes'],...s.processes.map(p=>[p.name,p.cost,p.note]),[],['Cost summary','USD / pc','BDT / pc','Total USD']];
+ document.querySelectorAll('#summaryRows tr').forEach(tr=>lines.push([...tr.children].map(td=>td.textContent)));
+ const csv=lines.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+ const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(s.style||'garments-costing')+'-costing.csv';a.click();URL.revokeObjectURL(url);
+}
+
+/* ===== LOGO UPLOAD + PERSIST ===== */
+document.getElementById('logoUpload').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    document.getElementById('companyLogo').src = ev.target.result;
+    document.getElementById('companyLogo').style.display = 'block';
+    localStorage.setItem('companyLogo', ev.target.result);
+  };
+  reader.readAsDataURL(file);
+});
+
+/* ===== GARMENT IMAGE UPLOAD + PERSIST ===== */
+document.getElementById('garmentUpload').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const img = document.getElementById('garmentImage');
+    img.src = ev.target.result;
+    img.style.display = 'block';
+    document.getElementById('garmentPlaceholder').style.display = 'none';
+    document.getElementById('removeGarmentBtn').style.display = 'flex';
+    localStorage.setItem('garmentImage', ev.target.result);
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('removeGarmentBtn').addEventListener('click', function(){
+  if (!confirm('Remove garment image?')) return;
+  document.getElementById('garmentImage').src = '';
+  document.getElementById('garmentImage').style.display = 'none';
+  document.getElementById('garmentPlaceholder').style.display = 'block';
+  document.getElementById('removeGarmentBtn').style.display = 'none';
+  localStorage.removeItem('garmentImage');
+});
+
+/* ===== LOAD SAVED IMAGES ON PAGE LOAD ===== */
+window.addEventListener('load', function(){
+  const savedLogo = localStorage.getItem('companyLogo');
+  if (savedLogo) {
+    document.getElementById('companyLogo').src = savedLogo;
+    document.getElementById('companyLogo').style.display = 'block';
+  }
+  const savedGarment = localStorage.getItem('garmentImage');
+  if (savedGarment) {
+    const img = document.getElementById('garmentImage');
+    img.src = savedGarment;
+    img.style.display = 'block';
+    document.getElementById('garmentPlaceholder').style.display = 'none';
+    document.getElementById('removeGarmentBtn').style.display = 'flex';
+  }
+});
+
+document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b===btn));['costing','saved','guide'].forEach(id=>$(id).classList.toggle('hidden',id!==btn.dataset.tab));if(btn.dataset.tab==='saved')renderSaved()}));
+document.querySelectorAll('#costing input,#costing select,#costing textarea').forEach(el=>el.addEventListener('input',calculate));
+$('category').addEventListener('change',()=>{$('materialHelp').textContent=$('category').value==='Sweater'?'Sweater: enter yarn consumption in grams per garment and price per kg. Other processes such as linking and knitting should be entered separately if not included in CM.':'Knit/Woven: enter fabric consumption and price in matching units, such as kg with price/kg or meter with price/meter.';calculate()});
+$('costDate').value=new Date().toISOString().slice(0,10);
+addPresetMaterial();addCommonTrims();addProcessPresets();calculate();
+</script>
+</body>
+</html>
